@@ -1,0 +1,125 @@
+2. Developing Natural Language Processing for Weather Questions
+
+Question1: How can I parse natural language weather questions to extract location, time, and intent?
+Source Chatgpt
+Answer: Great question! To parse natural language weather questions and extract key details like location, timeframe, and intent, you can leverage the hands-on-ai package, which interfaces with a language model to do this kind of natural language understanding (NLU).
+
+Approach
+1. Prompt the AI model with a clear instruction to parse the user’s question.
+
+2. Request the output in a structured format, such as JSON, with specific fields.
+
+3. The AI will return the parsed elements like:
+> location: e.g., "Melbourne"
+> timeframe: e.g., "tomorrow", "this weekend", "today"
+> intent: e.g., "rain", "temperature", "umbrella", "clothing advice"
+
+Example prompt and code snippet
+
+from hands_on_ai.chat import get_response
+import json
+
+def parse_weather_question(question):
+    prompt = f"""
+    Parse the following weather question into JSON with keys: location, timeframe, intent.
+    Example input: "Will it rain tomorrow in Melbourne?"
+    Example output: {{"location": "Melbourne", "timeframe": "tomorrow", "intent": "rain"}}
+    
+    Now parse this question: "{question}"
+    Return only JSON.
+    """
+    
+    response = get_response(prompt)
+    
+    # Convert the AI text response to a Python dictionary
+    parsed = json.loads(response)
+    return parsed
+
+# Example usage
+question = "Should I take an umbrella tomorrow in Sydney?"
+parsed_question = parse_weather_question(question)
+print(parsed_question)
+
+Expected output:
+
+{
+  "location": "Sydney",
+  "timeframe": "tomorrow",
+  "intent": "umbrella"
+}
+
+Notes:
+> If the location is missing, the AI might return "location": null or "". You can then prompt the user to specify it.
+
+> You can extend intent to capture different user needs like rain, temperature, picnic suitability, etc.
+
+> Want me to help you improve this for edge cases or handle ambiguous inputs?
+
+
+
+Question2: Can you give me a sample prompt and expected output for the question "Will it rain tomorrow in Melbourne?"
+Source Chatgpt
+Answer: Absolutely! Here's a sample prompt you could use with the AI (via the hands-on-ai package) and the expected output for the question:
+
+Sample Prompt:
+Parse the following weather question into JSON with keys: location, timeframe, intent.
+
+Example input: "Will it rain tomorrow in Melbourne?"
+Example output:
+{
+  "location": "Melbourne",
+  "timeframe": "tomorrow",
+  "intent": "rain"
+}
+
+Now parse this question: "Will it rain tomorrow in Melbourne?"
+Return only JSON.
+Expected AI Output
+
+{
+  "location": "Melbourne",
+  "timeframe": "tomorrow",
+  "intent": "rain"
+}
+This prompt tells the AI exactly what you want—structured info in JSON—and includes an example to help it understand the task.
+
+
+
+
+Question3: How do I handle questions without explicit location?
+Source Chatgpt
+Answer: Great point! When a user’s weather question doesn't mention a location explicitly, here’s how you can handle it effectively:
+
+Strategies to Handle Missing Location
+Detect missing location in your parsed output:
+
+If the AI returns "location": null, "", or no location key, treat it as missing.
+
+Prompt the user to provide their location:
+
+Ask a follow-up question like:
+"I didn't catch the location. Could you please tell me which city you're asking about?"
+
+Use a default location if available:
+
+If your app has a previously entered or stored location (like the user’s default city), use that automatically.
+
+Loop until location is obtained:
+
+Keep prompting the user until a valid location is provided before answering their weather question.
+
+Example flow in code:
+parsed = parse_weather_question(user_question)
+
+if not parsed.get("location"):
+    location = input("Please enter the location you're interested in: ")
+    parsed["location"] = location
+Why is this important?
+It avoids guessing or giving irrelevant info.
+
+It creates a more natural, conversational experience.
+
+Helps ensure your weather data fetch is accurate and useful.
+
+
+
