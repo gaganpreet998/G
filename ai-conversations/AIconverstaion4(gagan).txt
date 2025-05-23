@@ -1,0 +1,101 @@
+4. Refining the Code by Challenging the AI’s Initial Solutions
+
+
+Question 1: The AI-generated parse_weather_question function just echoes the input. How can I make it extract structured info?
+Source: ChatGPT
+Answer:You can improve the function by prompting the AI to return structured JSON with specific keys. Instruct it to always respond using a consistent format like:
+
+
+{
+  "location": "Melbourne",
+  "timeframe": "tomorrow",
+  "intent": "rain"
+}
+This format helps downstream logic like weather data retrieval and response generation. Your prompt to the model might look like this:
+
+
+prompt = f"""
+Parse the following weather question into JSON with keys: location, timeframe, and intent.
+Example: "Will it rain tomorrow in Melbourne?" → 
+{{"location": "Melbourne", "timeframe": "tomorrow", "intent": "rain"}}
+Question: "{question}"
+Return only valid JSON.
+"""
+
+By structuring your prompt this way, the model is guided to extract actionable, structured data, not just repeat or summarize the input.
+
+
+
+
+
+Question 2: What about edge cases like questions about past weather or ambiguous timeframes?
+Source: ChatGPT
+Answer: You can add logic to handle or flag unsupported queries. For example:
+
+> If the extracted timeframe is in the past (e.g., "last week"), respond with:
+"Sorry, I can only answer questions about today's or upcoming weather."
+> If the timeframe is unclear (e.g., "soon"), prompt the user for clarification.
+
+Within your parser or main logic, implement a check like:
+
+if parsed["timeframe"] in ["yesterday", "last week", "2020"]:
+    return "I can't provide historical weather data. Try asking about today or the next few days."
+This ensures clarity and helps guide the user toward supported interactions.
+
+
+
+
+
+Question 3: How can I test if the AI understands the fetch-my-weather capabilities properly?
+Source: ChatGPT
+Answer:Ask the AI direct, targeted questions such as:
+
+> “What arguments does get_weather() take?”
+> “What does the returned dictionary look like?”
+> “How does it handle an invalid city name?”
+
+Then, compare the AI’s answers against the official documentation or by directly testing the function in Python. For example:
+
+print(get_weather("FakeCity", days=2))
+You’re validating whether the AI:
+
+> Understands supported parameters
+> Knows the structure of the returned data
+>Handles common errors (like city not found)
+
+This strengthens your trust in how you use the package in your app.
+
+
+
+
+
+
+Question 4: Can you suggest improvements for code structure and error handling?
+Source: ChatGPT
+Answer: Yes, you can improve modularity and robustness by:
+
+1. Separating concerns:
+
+Create dedicated functions for:
+
+> Fetching weather data
+> Parsing user input
+> Generating natural-language responses
+
+2. Adding error handling:
+
+> Use try-except blocks to catch exceptions when calling external APIs:
+
+try:
+    data = get_weather(location, days=2)
+except Exception as e:
+    print("Error fetching weather:", e)
+    return "There was a problem retrieving the weather. Please try again."
+
+
+3.Encapsulating logic:
+
+> Keep your main application flow (UI, questions, responses) clean by moving lower-level details into helper functions.
+
+This leads to more maintainable, testable code and a better user experience.
+
